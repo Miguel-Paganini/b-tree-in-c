@@ -1,8 +1,18 @@
-#define ORDER 4
+#define ORDEM 8
 
-typedef struct node {
+typedef struct _chave {
+    int valor;
+    int pos;
+} Chave;
+
+typedef struct _pagina {
     int qtd;
-    char *keys[ORDER - 1];
-    int pos[ORDER - 1];
-    struct node *ptr[ORDER];
-} node_t;
+    Chave chaves[ORDEM - 1];
+    struct _pagina *filho[ORDEM];
+    int folha;
+} Pagina;
+
+typedef Pagina *ArvoreB;
+
+Pagina *criaPagina();
+ArvoreB inserirArvB(ArvoreB raiz, Chave chave);
