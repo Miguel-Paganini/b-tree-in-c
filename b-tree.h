@@ -14,5 +14,7 @@ typedef struct _pagina {
 
 typedef Pagina *ArvoreB;
 
-Pagina *criaPagina();
+Pagina *criaPagina(int folha);
+ArvoreB criarArvB();
+
 ArvoreB inserirArvB(ArvoreB raiz, Chave chave);
