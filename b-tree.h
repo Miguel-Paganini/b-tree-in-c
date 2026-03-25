@@ -21,4 +21,4 @@ typedef struct _pagina {
 typedef Pagina *ArvoreB;
 
 Pagina *criaPagina(int folha);
-int buscaArvB(Pagina *pagAtual, int chave, Pagina *pagChave, int *posChave);
+int buscaArvB(Pagina *pagAtual, int chave, Pagina **pagChave, int *posChave);

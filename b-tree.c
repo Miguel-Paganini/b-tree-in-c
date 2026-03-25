@@ -39,19 +39,19 @@ ArvoreB criarArvB(){
     return criaPagina(1);
 }
 
-int buscaArvB(Pagina *pagAtual, int chave, Pagina *pagChave, int *posChave){
-    if (pagAtual == NULL)
-        return 0;
-    else {
-        for (int i = 0; i < pagAtual->qtd; i++){
-            if (chave ==  pagAtual->chaves[i].valor){
-                *pagChave = *pagAtual;
-                *posChave = i;
-                return 1;
-            }
-            if (chave > pagAtual->chaves[i].valor) continue;
-            return buscaArvB(pagAtual->filho[i], chave, pagChave, posChave);
-        }
-        return buscaArvB(pagAtual->filho[pagAtual->qtd], chave, pagChave, posChave);
+int buscaArvB(Pagina *pagAtual, int chave, Pagina **pagChave, int *posChave){
+    if (pagAtual == NULL) return 0;
+
+    int i = 0;
+
+    while (i < pagAtual->qtd && chave > pagAtual->chaves[i].valor)
+        i++;
+    
+    if (i < pagAtual->qtd && chave == pagAtual->chaves[i].valor) {
+        *pagChave = pagAtual;
+        *posChave = i;
+        return 1;
     }
+
+    return buscaArvB(pagAtual->filho[i], chave, pagChave, posChave);
 }

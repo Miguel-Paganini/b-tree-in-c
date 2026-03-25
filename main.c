@@ -32,7 +32,7 @@ int main() {
     raiz->filho[2]->chaves[1].valor = 30;
 
     // Teste de busca
-    Pagina pagEncontrada;
+    Pagina *pagEncontrada;
     int pos;
 
     int chaveBusca = 15;
