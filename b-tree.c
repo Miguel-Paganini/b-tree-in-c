@@ -55,19 +55,3 @@ int buscaArvB(Pagina *pagAtual, int chave, Pagina *pagChave, int *posChave){
         return buscaArvB(pagAtual->filho[pagAtual->qtd], chave, pagChave, posChave);
     }
 }
-
-ArvoreB inserirArvB(Pagina *pagAtual, int chave, Pagina *filhoProDir, int *chaveProm) {
-    if (*pagAtual == NULL) {
-        *chaveProm = chave;
-        *filhoProDir = NULL;
-        return PROMOTION;
-    }
-    else {
-        for (int i = 0; i < pagAtual->qtd; i++) {
-            if (chave == pagAtual->chaves[i].valor) {
-                printf("Chave %d ja existe na arvore.\n", chave);
-                return ERROR;
-            }
-        }
-    }
-}
