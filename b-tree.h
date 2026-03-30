@@ -20,5 +20,9 @@ typedef struct _pagina {
 
 typedef Pagina *ArvoreB;
 
+ArvoreB criarArvB();
 Pagina *criaPagina(int folha);
 int buscaArvB(Pagina *pagAtual, int chave, Pagina **pagChave, int *posChave);
+void splitPagina(int chaveInserida, int posicaoFilho, Pagina *pagina, int *chavePromovida, Pagina **paginaFilhoDireita, Pagina **pagNova);
+int insereArvB(Pagina *pagAtual, int chave, int *chavePromovida, Pagina **pagPromovida);
+Pagina* inserir(Pagina *raiz, int chave);
