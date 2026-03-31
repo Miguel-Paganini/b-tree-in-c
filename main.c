@@ -7,6 +7,8 @@ int main(void)
     Pagina *raiz = carregarRegistros(ARQUIVO_REGISTROS);
     printf("Árvore B carregada em memória.\n\n");
 
+    gravarArvore(raiz, ARQUIVO_ARVORE);
+
     executarMenu(&raiz);
 
     return 0;

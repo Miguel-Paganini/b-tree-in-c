@@ -3,67 +3,67 @@
 
 #define ORDEM 5
 #define MAX_NOME 100
-#define MAX_TEL  20
+#define MAX_TEL 20
 #define ARQUIVO_REGISTROS "registros.csv"
-#define ARQUIVO_ARVORE    "arvore.txt"
+#define ARQUIVO_ARVORE "arvore.txt"
 
-/* ---------------------------------------------------------
- * Estruturas
- * --------------------------------------------------------- */
-typedef struct _chave {
-    int  valor;  /* matrícula – chave de busca */
-    long pos;    /* offset em bytes no arquivo de registros */
+/* Estruturas */
+
+typedef struct {
+    int valor;
+    long pos;
 } Chave;
 
 typedef struct _pagina {
+    int id;
     int qtd;
     Chave chaves[ORDEM - 1];
     struct _pagina *filho[ORDEM];
     int folha;
 } Pagina;
 
-typedef Pagina* ArvoreB;
+typedef Pagina *ArvoreB;
 
-/* ---------------------------------------------------------
- * Criação
- * --------------------------------------------------------- */
-Pagina  *criaPagina(int folha);
-ArvoreB  criarArvB(void);
+/* Criação */
 
-/* ---------------------------------------------------------
- * Busca
- * --------------------------------------------------------- */
+Pagina *criaPagina(int folha);
+ArvoreB criarArvB(void);
+
+/* Busca */
+
 int buscaArvB(Pagina *pagAtual, int chave,
               Pagina **pagChave, int *posChave);
 
-/* ---------------------------------------------------------
- * Inserção
- * --------------------------------------------------------- */
-void    splitPagina(int chaveInserida, int posicaoFilho,
-                    Pagina *pagina, int *chavePromovida,
-                    Pagina **paginaFilhoDireita, Pagina **pagNova);
-int     insereArvB(Pagina *pagAtual, int chave,
-                   int *chavePromovida, Pagina **pagPromovida);
-Pagina *inserir(Pagina *raiz, int chave);
+/* Inserção */
 
-/* ---------------------------------------------------------
- * Arquivo de registros
- * --------------------------------------------------------- */
-long    gravarRegistro(const char *nomeArq, int matricula,
-                       const char *nome, const char *tel);
-int     lerRegistro(const char *nomeArq, long pos,
-                    int *matricula, char *nome, char *tel);
+void splitPagina(int chaveInserida, long pos, int posicaoFilho,
+                 Pagina *pagina, Chave *chavePromovida,
+                 Pagina **paginaFilhoDireita, Pagina **pagNova);
+
+int insereArvB(Pagina *pagAtual, int chave, long pos,
+               Chave *chavePromovida, Pagina **pagPromovida);
+
+Pagina *inserir(Pagina *raiz, int chave, long pos);
+
+/* Arquivo de registros */
+
+void atribuirIDs(Pagina *raiz);
+
+long gravarRegistro(const char *nomeArq, int matricula,
+                    const char *nome, const char *tel);
+
+int lerRegistro(const char *nomeArq, long pos,
+                int *matricula, char *nome, char *tel);
+
 Pagina *carregarRegistros(const char *nomeArq);
 
-/* ---------------------------------------------------------
- * Persistência e liberação da árvore
- * --------------------------------------------------------- */
+/* Persistência */
+
 void gravarArvore(Pagina *raiz, const char *nomeArq);
 void liberarArvore(Pagina *raiz);
 
-/* ---------------------------------------------------------
- * Menu
- * --------------------------------------------------------- */
+/* Menu */
+
 void executarMenu(Pagina **raiz);
 
-#endif /* B_TREE_H */
+#endif
