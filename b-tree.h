@@ -25,7 +25,7 @@ typedef struct _pagina {
 typedef Pagina* ArvoreB;
 
 /* ---------------------------------------------------------
- * Criação de páginas / árvore
+ * Criação
  * --------------------------------------------------------- */
 Pagina  *criaPagina(int folha);
 ArvoreB  criarArvB(void);
@@ -60,5 +60,10 @@ Pagina *carregarRegistros(const char *nomeArq);
  * --------------------------------------------------------- */
 void gravarArvore(Pagina *raiz, const char *nomeArq);
 void liberarArvore(Pagina *raiz);
+
+/* ---------------------------------------------------------
+ * Menu
+ * --------------------------------------------------------- */
+void executarMenu(Pagina **raiz);
 
 #endif /* B_TREE_H */
