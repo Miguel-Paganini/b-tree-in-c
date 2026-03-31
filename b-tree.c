@@ -65,17 +65,15 @@ void splitPagina(int chaveInserida, int posicaoFilho,
     *pagNova = criaPagina(pagina->folha);
     if (!*pagNova) return;
 
-    /* cópias temporárias com espaço para a nova chave/filho */
     Chave  chavesTemp[ORDEM];
     Pagina *filhosTemp[ORDEM + 1];
 
     for (int i = 0; i < pagina->qtd; i++) {
-        chavesTemp[i]  = pagina->chaves[i];
-        filhosTemp[i]  = pagina->filho[i];
+        chavesTemp[i] = pagina->chaves[i];
+        filhosTemp[i] = pagina->filho[i];
     }
     filhosTemp[pagina->qtd] = pagina->filho[pagina->qtd];
 
-    /* abre espaço para inserir */
     for (int i = pagina->qtd; i > posicaoFilho; i--) {
         chavesTemp[i]     = chavesTemp[i - 1];
         filhosTemp[i + 1] = filhosTemp[i];
@@ -84,10 +82,9 @@ void splitPagina(int chaveInserida, int posicaoFilho,
     filhosTemp[posicaoFilho + 1]   = *paginaFilhoDireita;
 
     int meio = ORDEM / 2;
-    *chavePromovida    = chavesTemp[meio].valor;
+    *chavePromovida     = chavesTemp[meio].valor;
     *paginaFilhoDireita = *pagNova;
 
-    /* metade esquerda fica na página original */
     for (int i = 0; i < meio; i++) {
         pagina->chaves[i] = chavesTemp[i];
         pagina->filho[i]  = filhosTemp[i];
@@ -95,7 +92,6 @@ void splitPagina(int chaveInserida, int posicaoFilho,
     pagina->filho[meio] = filhosTemp[meio];
     pagina->qtd = meio;
 
-    /* metade direita vai para a página nova */
     for (int i = meio + 1; i < ORDEM; i++) {
         (*pagNova)->chaves[i - meio - 1] = chavesTemp[i];
         (*pagNova)->filho[i - meio - 1]  = filhosTemp[i];
@@ -127,10 +123,9 @@ int insereArvB(Pagina *pagAtual, int chave,
     if (retorno != 1) return retorno;
 
     if (pagAtual->qtd < ORDEM - 1) {
-        /* há espaço: insere diretamente */
         for (int j = pagAtual->qtd; j > i; j--) {
-            pagAtual->chaves[j]     = pagAtual->chaves[j - 1];
-            pagAtual->filho[j + 1]  = pagAtual->filho[j];
+            pagAtual->chaves[j]    = pagAtual->chaves[j - 1];
+            pagAtual->filho[j + 1] = pagAtual->filho[j];
         }
         pagAtual->chaves[i].valor = *chavePromovida;
         pagAtual->filho[i + 1]    = *pagPromovida;
@@ -138,7 +133,6 @@ int insereArvB(Pagina *pagAtual, int chave,
         return 0;
     }
 
-    /* página cheia: split */
     Pagina *pagNova = NULL;
     splitPagina(*chavePromovida, i, pagAtual,
                 chavePromovida, pagPromovida, &pagNova);
@@ -165,13 +159,6 @@ Pagina *inserir(Pagina *raiz, int chave)
 
 /* =========================================================
  * ARQUIVO DE REGISTROS
- *
- * Formato do registros.csv:
- *   <matricula>,<nome>,<telefone>\n
- *
- * O campo `pos` de cada chave da árvore guarda o offset
- * em bytes (ftell) do início da linha correspondente,
- * permitindo acesso direto via fseek – sem varredura.
  * ========================================================= */
 
 long gravarRegistro(const char *nomeArq, int matricula,
@@ -200,7 +187,7 @@ int lerRegistro(const char *nomeArq, long pos,
         return 0;
     }
 
-    fseek(f, pos, SEEK_SET);   /* acesso direto */
+    fseek(f, pos, SEEK_SET);
 
     char linha[256];
     if (!fgets(linha, sizeof(linha), f)) {
@@ -231,7 +218,7 @@ Pagina *carregarRegistros(const char *nomeArq)
     Pagina *raiz = criarArvB();
 
     FILE *f = fopen(nomeArq, "r");
-    if (!f) return raiz;   /* arquivo ainda não existe */
+    if (!f) return raiz;
 
     char linha[256];
     while (1) {
@@ -262,7 +249,6 @@ Pagina *carregarRegistros(const char *nomeArq)
             raiz = novaRaiz;
         }
 
-        /* associa o offset à chave inserida */
         if (ret >= 0) {
             Pagina *pChave = NULL;
             int     posC   = -1;
@@ -288,12 +274,10 @@ void gravarArvore(Pagina *raiz, const char *nomeArq)
         return;
     }
 
-    /* primeira linha: endereço do nó raiz */
     fprintf(f, "RAIZ=%p\n", (void*)raiz);
 
     if (!raiz) { fclose(f); return; }
 
-    /* BFS para gravar todos os nós em largura */
     Pagina *fila[4096];
     int ini = 0, fim = 0;
     fila[fim++] = raiz;
@@ -329,4 +313,156 @@ void liberarArvore(Pagina *raiz)
     for (int i = 0; i <= raiz->qtd; i++)
         liberarArvore(raiz->filho[i]);
     free(raiz);
+}
+
+
+/* =========================================================
+ * HELPERS DE LEITURA  (estáticos – uso interno)
+ * ========================================================= */
+
+static void limpaBuf(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
+static void leString(const char *prompt, char *buf, int tam)
+{
+    printf("%s", prompt);
+    fflush(stdout);
+    if (!fgets(buf, tam, stdin)) buf[0] = '\0';
+    buf[strcspn(buf, "\n")] = '\0';
+}
+
+static int leInteiro(const char *prompt)
+{
+    int v;
+    printf("%s", prompt);
+    fflush(stdout);
+    while (scanf("%d", &v) != 1) {
+        printf("Entrada inválida. Tente novamente: ");
+        limpaBuf();
+    }
+    limpaBuf();
+    return v;
+}
+
+
+/* =========================================================
+ * OPÇÕES DO MENU  (estáticas – uso interno)
+ * ========================================================= */
+
+static void opcaoCadastrar(Pagina **raiz)
+{
+    int  matricula;
+    char nome[MAX_NOME];
+    char tel[MAX_TEL];
+
+    matricula = leInteiro("Matrícula : ");
+
+    Pagina *pChave = NULL;
+    int     posC   = -1;
+    if (buscaArvB(*raiz, matricula, &pChave, &posC)) {
+        printf("Erro: matrícula %d já cadastrada.\n", matricula);
+        return;
+    }
+
+    leString("Nome      : ", nome, sizeof(nome));
+    leString("Telefone  : ", tel,  sizeof(tel));
+
+    long pos = gravarRegistro(ARQUIVO_REGISTROS, matricula, nome, tel);
+    if (pos < 0) {
+        printf("Erro ao gravar registro em disco.\n");
+        return;
+    }
+
+    int    chavePromovida;
+    Pagina *pagPromovida = NULL;
+    int ret = insereArvB(*raiz, matricula, &chavePromovida, &pagPromovida);
+
+    if (ret == 1) {
+        Pagina *novaRaiz = criaPagina(0);
+        novaRaiz->chaves[0].valor = chavePromovida;
+        novaRaiz->filho[0]        = *raiz;
+        novaRaiz->filho[1]        = pagPromovida;
+        novaRaiz->qtd             = 1;
+        *raiz = novaRaiz;
+    }
+
+    if (ret >= 0) {
+        pChave = NULL; posC = -1;
+        if (buscaArvB(*raiz, matricula, &pChave, &posC))
+            pChave->chaves[posC].pos = pos;
+    }
+
+    printf("Aluno cadastrado com sucesso!\n");
+}
+
+static void opcaoPesquisar(Pagina *raiz)
+{
+    int matricula = leInteiro("Matrícula a pesquisar: ");
+
+    Pagina *pChave = NULL;
+    int     posC   = -1;
+
+    if (!buscaArvB(raiz, matricula, &pChave, &posC)) {
+        printf("Matrícula %d não encontrada.\n", matricula);
+        return;
+    }
+
+    long pos = pChave->chaves[posC].pos;
+    int  mat2;
+    char nome[MAX_NOME], tel[MAX_TEL];
+
+    if (!lerRegistro(ARQUIVO_REGISTROS, pos, &mat2, nome, tel)) {
+        printf("Erro ao ler registro do arquivo.\n");
+        return;
+    }
+
+    printf("---------------------------\n");
+    printf("Matrícula : %d\n", mat2);
+    printf("Nome      : %s\n", nome);
+    printf("Telefone  : %s\n", tel);
+    printf("---------------------------\n");
+}
+
+static void opcaoGravar(Pagina *raiz)
+{
+    gravarArvore(raiz, ARQUIVO_ARVORE);
+}
+
+static void opcaoSair(Pagina *raiz)
+{
+    liberarArvore(raiz);
+    printf("Memória liberada. Encerrando.\n");
+}
+
+
+/* =========================================================
+ * MENU PRINCIPAL  (única função pública deste bloco)
+ * ========================================================= */
+
+void executarMenu(Pagina **raiz)
+{
+    int opcao;
+    do {
+        printf("=============================\n");
+        printf("  MENU PRINCIPAL\n");
+        printf("=============================\n");
+        printf("  1. Cadastrar\n");
+        printf("  2. Pesquisar\n");
+        printf("  3. Gravar\n");
+        printf("  4. Sair\n");
+        printf("=============================\n");
+        opcao = leInteiro("Opção: ");
+
+        switch (opcao) {
+            case 1: opcaoCadastrar(raiz); break;
+            case 2: opcaoPesquisar(*raiz); break;
+            case 3: opcaoGravar(*raiz);    break;
+            case 4: opcaoSair(*raiz);      break;
+            default: printf("Opção inválida.\n");
+        }
+        printf("\n");
+    } while (opcao != 4);
 }
